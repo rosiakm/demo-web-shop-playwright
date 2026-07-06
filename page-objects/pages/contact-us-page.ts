@@ -10,6 +10,7 @@ export class ContactUsPage extends SidebarPage{
     private readonly enquiryInput: Locator = this.page.getByLabel("Enquiry");
     private readonly submitButton: Locator = this.page.getByRole("button", {name: "Submit"});
     private readonly resultText: Locator = this.page.locator(".page-body .result");
+    private readonly gitTestLocator: Locator = this.page.locator(".gitTest");
 
     async sendAnEnquiry(firstName: string, email: string, enquiry: string): Promise<void>{
         await this.nameInput.clear();
