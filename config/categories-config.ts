@@ -4,7 +4,7 @@ import { PriceFilters } from "../enums/filters";
 
 export type FiltersConfig = {
     price?: Array<{
-        name: PriceFilters,
+        name?: PriceFilters,
         min?: number,
         max?: number
     }>
