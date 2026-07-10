@@ -1,7 +1,8 @@
 import {test, expect} from '../fixtures/fixtures'
 import { Categories } from "../../enums/categories"
 import { categoriesConfig } from "../../config/categories-config"
-import { BooksPriceFilters } from '../../enums/filters';
+import { PriceFilters } from '../../enums/filters';
+import { calculateExpectedCounts } from '../helpers/calculate-expected-count';
 
 for(const category of Object.values(Categories)){
     const config = categoriesConfig[category as Categories];
@@ -56,7 +57,15 @@ test('Product grid - change grid size', async ({page, categoryPage, sidebarPage}
 })
 
 test("Product grid - filter products", async ({categoryPage, sidebarPage}) => {
-    await sidebarPage.Sidebar.navigateTo(Categories.BOOKS);
+    await sidebarPage.Sidebar.navigateTo(Categories.JEWELRY);
+    
+    const prices = await categoryPage.getActualPrices();
+    const expected = calculateExpectedCounts(prices, Categories.JEWELRY);
+    console.log(expected);
 
-    await categoryPage.selectPriceFilter(BooksPriceFilters.FROM_25_TO_50, Categories.BOOKS);
+    await categoryPage.selectPriceFilter(PriceFilters.FROM_700_TO_3000);
+
+    const actual = await categoryPage.getProductItemsCount();
+
+    expect(actual).toBe(expected[PriceFilters.FROM_700_TO_3000]);
 })

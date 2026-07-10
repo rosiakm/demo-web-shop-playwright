@@ -10,8 +10,6 @@ export class ContactUsPage extends SidebarPage{
   private readonly enquiryInput: Locator = this.page.getByLabel("Enquiry");
   private readonly submitButton: Locator = this.page.getByRole("button", {name: "Submit"});
   private readonly resultText: Locator = this.page.locator(".page-body .result");
-  private readonly gitTestLocator: Locator = this.page.locator(".gitTest");
-  private readonly testLocator: Locator = this.page.locator("test");
 
   async sendAnEnquiry(firstName: string, email: string, enquiry: string): Promise<void>{
     await this.nameInput.clear();
@@ -20,7 +18,6 @@ export class ContactUsPage extends SidebarPage{
     await this.emailInput.fill(email);
     await this.enquiryInput.clear();
     await this.enquiryInput.fill(enquiry);
-
     await this.submitButton.click();
   }
 
