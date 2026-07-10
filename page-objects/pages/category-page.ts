@@ -3,7 +3,6 @@ import { Locator } from "@playwright/test";
 import { ProductDetailsPage } from "./product-details-page";
 import { Categories } from "../../enums/categories";
 import { Subcategories } from "../../enums/subcategories";
-import { categoriesConfig } from "../../config/categories-config";
 import { PriceFilters } from "../../enums/filters";
 
 export class CategoryPage extends SidebarPage{
@@ -16,7 +15,7 @@ export class CategoryPage extends SidebarPage{
     private readonly nextPageButton: Locator = this.page.locator(".next-page");
     private readonly subcategoryGrid: Locator = this.page.locator(".sub-category-grid");
     private readonly priceRangeSelectors: Locator = this.page.locator(".price-range-selector li a");
-    
+        
     async openFirstProductDetails(): Promise<ProductDetailsPage> {
         const firstItem = this.productName.first();
         const alias = (await firstItem.locator("a").getAttribute("href"))?.replace("/", "")!;
@@ -48,6 +47,11 @@ export class CategoryPage extends SidebarPage{
         return await this.productItems.count();
     }
 
+    async getActualPrices(): Promise<number[]>{
+        const prices = await this.productItems.locator(".actual-price").allInnerTexts();
+        return prices.map(price => Number(price))
+    }
+
     async navigateToSubcategory(
         category: Categories,
         subcategory: Subcategories
@@ -56,10 +60,8 @@ export class CategoryPage extends SidebarPage{
             await this.subcategoryGrid.getByText(subcategory).click();
         }
 
-    async selectPriceFilter(category: Categories, filterName: PriceFilters): Promise<void>{
-        const filters = categoriesConfig[category].filters?.price?? [];
-
-        await this.priceRangeSelectors.nth(filters.indexOf(filterName)).click();
+    async selectPriceFilter(filterName: PriceFilters): Promise<void>{
+        await this.priceRangeSelectors.filter({hasText: filterName}).click();
     }
     
     async isProductGridVisible(): Promise<boolean>{
