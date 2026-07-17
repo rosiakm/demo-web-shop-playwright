@@ -31,7 +31,7 @@ for(const categoryKey in categoriesConfig){
         })
     }
     for(const subcategory of categoryData.subcategories){
-        test(`Product details in ${category} -> ${subcategory}`, async({page, sidebarPage, categoryPage}) => {
+        test(`Product details in ${category} -> ${subcategory.name}`, async({page, sidebarPage, categoryPage}) => {
             test.setTimeout(10_000);
             await sidebarPage.Sidebar.navigateToSubcategory(category, subcategory);
             await categoryPage.openFirstProductDetails();
