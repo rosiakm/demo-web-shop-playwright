@@ -74,7 +74,7 @@ export class CheckoutFormPage extends BasePage{
             await this.firstNameInput.fill(user.firstName);
             await this.lastNameInput.fill(user.lastName);
             await this.emailInput.fill(user.email);
-            await this.countrySelect.fill(user.address.country);
+            await this.countrySelect.selectOption(user.address.country);
             await this.cityInput.fill(user.address.city);
             await this.streetAddress.fill(user.address.firstAddress);
             await this.zipCodeInput.fill(user.address.zipCode);

@@ -27,8 +27,10 @@ export class CategoryPage extends SidebarPage{
         return productPage;
     }
     
-    async openProductDetailsByName(productName: string): Promise<void>{
+    async openProductDetailsByName(productName: string): Promise<ProductDetailsPage>{
         await this.productName.getByRole('link', {name: productName}).click();
+        const productPage = new ProductDetailsPage(this.page);
+        return productPage;
     }
     
     async selectPageSize(option: string): Promise<void>{

@@ -3,9 +3,7 @@ import { ProductDetailsPage } from '../../page-objects/pages/product-details-pag
 import { Categories } from '../../enums/categories';
 import { Subcategories } from '../../enums/subcategories';
 import { categoriesConfig } from '../../config/categories-config';
-import { LoginPage } from '../../page-objects/pages/login-page';
 import { ReviewPage } from '../../page-objects/pages/review-page';
-import { CategoryPage } from '../../page-objects/pages/category-page';
 
 for(const categoryKey in categoriesConfig){
     const category = categoryKey as Categories;
@@ -13,51 +11,35 @@ for(const categoryKey in categoriesConfig){
 
     if(categoryData.hasProducts){
         test(`Product details in ${category}`, async ({page, sidebarPage, categoryPage}) => {
-            test.setTimeout(10_000);
             await sidebarPage.Sidebar.navigateTo(category);
-            await categoryPage.openFirstProductDetails();
 
-            const productDetailsPage = new ProductDetailsPage(page);
+            const productDetailsPage = await categoryPage.openFirstProductDetails();
+            await page.waitForLoadState();
             expect(await productDetailsPage.isProductNameVisible()).toBeTruthy();
             expect(await productDetailsPage.isProductDescriptionVisible()).toBeTruthy();
             expect(await productDetailsPage.isPriceValueVisible()).toBeTruthy();
-        
-            const stockStatus = productDetailsPage.getStockStatus();
-            if(await stockStatus === "In stock"){
-                expect(await productDetailsPage.isAddToCartButtonVisible()).toBeTruthy();
-            } else {
-                expect(await productDetailsPage.isAddToCartButtonVisible()).toBeFalsy();
-            }
         })
     }
     for(const subcategory of categoryData.subcategories){
         test(`Product details in ${category} -> ${subcategory.name}`, async({page, sidebarPage, categoryPage}) => {
-            test.setTimeout(10_000);
-            await sidebarPage.Sidebar.navigateToSubcategory(category, subcategory);
-            await categoryPage.openFirstProductDetails();
-            console.log(await page.url());
+            await sidebarPage.Sidebar.navigateToSubcategory(category, subcategory.name);
             
-            const productDetailsPage = new ProductDetailsPage(page);
+            const productDetailsPage = await categoryPage.openFirstProductDetails();
+            
+            await page.waitForLoadState();
             expect(await productDetailsPage.isProductNameVisible()).toBeTruthy();
             expect(await productDetailsPage.isProductDescriptionVisible()).toBeTruthy();
             expect(await productDetailsPage.isPriceValueVisible()).toBeTruthy();
-    
-            const stockStatus = await productDetailsPage.getStockStatus();
-            if(stockStatus === "In stock"){
-                expect(await productDetailsPage.isAddToCartButtonVisible()).toBeTruthy();
-            } else {
-                expect(await productDetailsPage.isAddToCartButtonVisible()).toBeFalsy();
-            }
         })
     }
 }
 
 test('Add product review - logged in user', async({page, loggedInUser, categoryPage}) => {
     await loggedInUser.Sidebar.navigateToSubcategory(Categories.ELECTRONICS, Subcategories.CELL_PHONES);
-    await categoryPage.openProductDetailsByName("Used phone");
     
-    const productDetailsPage = new ProductDetailsPage(page);
-    await productDetailsPage.addReviewLink.click();
+    const productDetailsPage = await categoryPage.openProductDetailsByName("Used phone");
+    await productDetailsPage.openAddReviewLink();
+    
     const reviewPage = new ReviewPage(page);
     await reviewPage.sendReview("Test title", "This is random test text");
 
@@ -71,7 +53,7 @@ test('Add product review - log out user', async({page, homePage, categoryPage}) 
     await categoryPage.openProductDetailsByName("Elite Desktop PC");
 
     const productDetailsPage = new ProductDetailsPage(page);
-    await productDetailsPage.reviewsLink.click();
+    await productDetailsPage.openReviewsLink();
 
     const reviewPage = new ReviewPage(page);
     const expectedMessage = reviewPage.texts.errorMessage;

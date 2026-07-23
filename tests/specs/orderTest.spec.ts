@@ -14,10 +14,10 @@ test('Order product as guest - happy path', async({cartWithProduct, page, checko
     await checkoutFormPage.fillCheckoutForm(user);
     await checkoutFormPage.moveThroughTheForm();
 
-    await expect(checkoutFormPage.isNameToBe(user.firstName,user.lastName)).toBeTruthy();
-    await expect(checkoutFormPage.isEmailToBe(user.email)).toBeTruthy();
-    await expect(checkoutFormPage.isPhoneNumberToBe(user.phoneNumber)).toBeTruthy();
-    await expect(checkoutFormPage.isAddressToBe(user.address.firstAddress)).toBeTruthy();
-    await expect(checkoutFormPage.isCityStateZipToBe(user.address.city,user.address.zipCode)).toBeTruthy();
-    await expect(checkoutFormPage.isCountryToBe(user.address.country)).toBeTruthy();
+    expect(await checkoutFormPage.isNameToBe(user.firstName,user.lastName)).toBeTruthy();
+    expect(await checkoutFormPage.isEmailToBe(user.email)).toBeTruthy();
+    expect(await checkoutFormPage.isPhoneNumberToBe(user.phoneNumber)).toBeTruthy();
+    expect(await checkoutFormPage.isAddressToBe(user.address.firstAddress)).toBeTruthy();
+    expect(await checkoutFormPage.isCityStateZipToBe(user.address.city,user.address.zipCode)).toBeTruthy();
+    expect(await checkoutFormPage.isCountryToBe(user.address.country)).toBeTruthy();
 })

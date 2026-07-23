@@ -21,7 +21,7 @@ test('Wishlist - add product to wishlist', async({
     const expectedTotalPrice = (Number(quantity) * Number(price)).toFixed(2);
 
     await productDetailsPage.addProductToWishlist();
-    await expect (productDetailsPage.Header.getWishlistCartIndicatorText()).toEqual("(1)")
+    expect (await productDetailsPage.Header.getWishlistCartIndicatorText()).toEqual("(1)")
     await productDetailsPage.Header.openWhishlist();
 
     const wishlistPage = new WishlistPage(page);
@@ -41,7 +41,7 @@ test('Wishlist - delete all items', async({wishlistWithProduct, page}) => {
     const wishlist = new WishlistPage(page);
     await wishlist.table.removeItemFromTable(wishlist.table.rows.first());
     await expect(wishlist.table.rows).toHaveCount(0);
-    await expect(wishlist.isEmptyWishlistHasPlaceholderText("The wishlist is empty!")).toBeTruthy();
+    expect(await wishlist.isEmptyWishlistHasPlaceholderText("The wishlist is empty!")).toBeTruthy();
 })
 
 test('Whishlist - change quantity', async({wishlistWithProduct, page}) => {
@@ -58,14 +58,14 @@ test('Whishlist - change quantity', async({wishlistWithProduct, page}) => {
 test('Wishlist - add product to cart', async({wishlistWithProduct, page}) => {
     const wishlist = new WishlistPage(page);
     
-    await expect (wishlist.Header.getShoppingCartIndicatorText()).toEqual('(0)');
-    await expect (wishlist.Header.getWishlistCartIndicatorText()).toEqual('(1)');
+    expect (await wishlist.Header.getShoppingCartIndicatorText()).toEqual('(0)');
+    expect (await wishlist.Header.getWishlistCartIndicatorText()).toEqual('(1)');
     
     const productName = await wishlist.table.rows.first().locator('.product a').innerText();
     await wishlist.addProductToCart(wishlist.table.rows.first());
 
     const shoppingCart = new ShoppingCartPage(page);
-    await expect (wishlist.Header.getShoppingCartIndicatorText()).toEqual('(1)');
-    await expect (wishlist.Header.getWishlistCartIndicatorText()).toEqual('(0)');
+    expect (await wishlist.Header.getShoppingCartIndicatorText()).toEqual('(1)');
+    expect (await wishlist.Header.getWishlistCartIndicatorText()).toEqual('(0)');
     await expect(shoppingCart.table.rows.first().locator('.product a[class="product-name"]')).toHaveText(productName);
 })

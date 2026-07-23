@@ -12,14 +12,14 @@ test('Register user happy path', async ({homePage, registerPage}) => {
     await registerPage.fillTheRegisterForm(user);
     await registerPage.submit();
 
-    await expect (registerPage.isPlaceholderAfterRegisterConfirmationHasText("Your registration completed")).toBeTruthy();
+    expect (await registerPage.isPlaceholderAfterRegisterConfirmationHasText("Your registration completed")).toBeTruthy();
 })
 
 test('Register form - submit empty form - validation messages', async({homePage, registerPage}) => {
     await homePage.Header.openRegisterPage();
     await registerPage.submit();
 
-    await expect(registerPage.isRequiredFieldsHasErrorText([
+    expect(await registerPage.isRequiredFieldsHasErrorText([
         RegisterInputs.firstName,
         RegisterInputs.lastName,
         RegisterInputs.email,
@@ -35,19 +35,19 @@ test('Register form - validation disappears after input', async ({homePage, regi
     await registerPage.submit();
 
     await registerPage.fillFirstName(user.firstName);
-    await expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.firstName)).toBeFalsy();
+    expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.firstName)).toBeFalsy();
 
     await registerPage.fillLastName(user.lastName);
-    await expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.lastName)).toBeFalsy();
+    expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.lastName)).toBeFalsy();
 
     await registerPage.fillEmail(user.email);
-    await expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.email)).toBeFalsy();
+    expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.email)).toBeFalsy();
 
     await registerPage.fillPassword(user.password);
-    await expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.password)).toBeFalsy();
+    expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.password)).toBeFalsy();
 
     await registerPage.fillConfirmPassword(user.password);
-    await expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.confirmPassword)).toBeFalsy();
+    expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.confirmPassword)).toBeFalsy();
 })
 
 test('Register form - invalid password length', async ({homePage, registerPage}) => {
@@ -57,10 +57,10 @@ test('Register form - invalid password length', async ({homePage, registerPage})
 
     await homePage.Header.openRegisterPage();
     await registerPage.fillPassword(user.password);
-    await expect(await registerPage.getInputValidationText(RegisterInputs.password)).toEqual("The password should have at least 6 characters.");
+    expect(await registerPage.getInputValidationText(RegisterInputs.password)).toEqual("The password should have at least 6 characters.");
 
     await registerPage.fillPassword(`${user.password}x`);
-    await expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.password)).toBeFalsy();
+    expect(await registerPage.isRequiredFieldValidationTextVisible(RegisterInputs.password)).toBeFalsy();
 })
 
 test('Register form - non matched passwords', async({homePage, registerPage}) => {
@@ -70,5 +70,5 @@ test('Register form - non matched passwords', async({homePage, registerPage}) =>
     await registerPage.fillPassword(user.password);
     await registerPage.fillConfirmPassword(`${user.password}xyz`);
 
-    await expect(await registerPage.getInputValidationText(RegisterInputs.confirmPassword)).toEqual("The password and confirmation password do not match.");
+    expect(await registerPage.getInputValidationText(RegisterInputs.confirmPassword)).toEqual("The password and confirmation password do not match.");
 })
