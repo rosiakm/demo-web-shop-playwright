@@ -1,0 +1,17 @@
+steps:
+  - task: NodeTool@0
+    displayName: "Use Node 20.x"
+    inputs:
+      versionSpec: 20.x
+  
+  - script: |
+      npm install
+      npx playwright install
+    displayName: 'npm install and npx playwright install'
+
+  - task: Npm@1
+    displayName: "npx playwright test"
+    inputs:
+      command: custom
+      customCommand: "run e2e"
+      verbose: true

@@ -1,0 +1,23 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  name: Azure Pipelines
+  vmImage: ubuntu-latest
+  demands:
+    - msbuild
+    - visualstudio
+    - vstest
+
+stages:
+  - stage: E2ETests
+    displayName: "E2E Tests"
+    jobs:
+      - job:
+        displayName: "Playwright Tests"
+        steps:
+          - template: template-e2e-playwright-test-azure-pipelines.yml
