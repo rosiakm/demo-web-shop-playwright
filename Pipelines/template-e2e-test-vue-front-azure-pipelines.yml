@@ -1,0 +1,80 @@
+steps:
+  - task: NodeTool@0
+    displayName: "Use Node 20.x"
+    inputs:
+      versionSpec: 20.x
+
+  - task: CmdLine@2
+    displayName: "Install dependencies for Personal Brand Front"
+    inputs:
+      script: "yarn install"
+      workingDirectory: "$(Parameters.FrontProject)"
+
+  - task: Npm@1
+    displayName: "Run e2e tests on Chrome"
+    continueOnError: true
+    inputs:
+      command: "custom"
+      workingDir: "$(Parameters.FrontProject)"
+      customCommand: "run cypress:run-chrome -- --config baseUrl=$(ClientUrl)"
+      verbose: true
+
+  - task: Npm@1
+    displayName: "Run e2e tests on Edge"
+    continueOnError: true
+    inputs:
+      command: "custom"
+      workingDir: "$(Parameters.FrontProject)"
+      customCommand: "run cypress:run-edge -- --config baseUrl=$(ClientUrl)"
+      verbose: true
+
+  - task: Npm@1
+    displayName: "Run e2e tests on Firefox"
+    continueOnError: true
+    inputs:
+      command: "custom"
+      workingDir: "$(Parameters.FrontProject)"
+      customCommand: "run cypress:run-firefox -- --config baseUrl=$(ClientUrl)"
+      verbose: true
+
+  - task: Npm@1
+    displayName: "Generate reports"
+    inputs:
+      command: "custom"
+      workingDir: "$(Parameters.FrontProject)"
+      customCommand: "run cypress:generate-reports"
+      verbose: true
+
+  - task: PublishTestResults@2
+    displayName: "Publish e2e tests"
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: "JUnit"
+      testResultsFiles: "**/e2e-result.xml"
+      searchFolder: "$(Parameters.FrontProject)"
+      testRunTitle: "Vue frontend e2e tests"
+
+  - task: PowerShell@2
+    displayName: "Check existing of screenshots and videos"
+    condition: succeededOrFailed()
+    inputs:
+      targetType: "inline"
+      script: |
+        $screenshotsExists = Test-Path -Path "$(Parameters.FrontProject)/cypress/screenshots/"
+        Write-Output "##vso[task.setvariable variable=ScreenshotsExists]$screenshotsExists"
+        $videosExists = Test-Path -Path "$(Parameters.FrontProject)/cypress/videos/"
+        Write-Output "##vso[task.setvariable variable=VideosExists]$videosExists"
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish cypress screenshots"
+    condition: eq(variables['ScreenshotsExists'], True)
+    inputs:
+      PathtoPublish: "$(Parameters.FrontProject)/cypress/screenshots/"
+      ArtifactName: "cypress-screenshots"
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish cypress videos"
+    condition: eq(variables['VideosExists'], True)
+    inputs:
+      PathtoPublish: "$(Parameters.FrontProject)/cypress/videos/"
+      ArtifactName: "cypress-videos"

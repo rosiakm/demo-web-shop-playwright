@@ -1,0 +1,88 @@
+trigger:
+  branches:
+    include:
+      - develop
+
+pr: none
+
+pool:
+  name: Azure Pipelines
+  vmImage: "windows-2022"
+  demands:
+    - msbuild
+    - visualstudio
+    - vstest
+
+variables:
+  BuildConfiguration: "release"
+  BuildPlatform: "any cpu"
+  Parameters.Solution: "PersonalBrand.sln"
+  Parameters.ArtifactName: "api"
+  Parameters.FrontProject: "Frontend/personal-brand-front"
+  Parameters.BackProject: "Frontend/personal-brand-back"
+  Parameters.BackProject.Arguments: "--configuration test"
+
+stages:
+  - stage: Build
+    displayName: "Build"
+    jobs:
+      - job:
+        displayName: "Build Personal Brand Front - Vue application"
+        steps:
+          - template: template-build-vue-front-azure-pipelines.yml
+
+      - job:
+        displayName: "Build Personal Brand Back - Angular application"
+        steps:
+          - template: template-build-angular-back-azure-pipelines.yml
+
+      - job:
+        displayName: "Build Personal Brand Backend - .NET application"
+        steps:
+          - template: template-build-dotnet-backend-azure-pipelines.yml
+
+  - stage: UnitTests
+    displayName: "Unit tests"
+    dependsOn: Build
+    jobs:
+      - job:
+        displayName: "Backend unit tests"
+        steps:
+          - template: template-unit-test-dotnet-backend-azure-pipelines.yml
+
+      - job:
+        displayName: "Vue frontend unit tests"
+        steps:
+          - template: template-unit-test-vue-front-azure-pipelines.yml
+
+  - stage: Publish
+    displayName: "Publish"
+    dependsOn:
+      - Build
+      - UnitTests
+    jobs:
+      - job:
+        displayName: "Publish"
+        steps:
+          - template: template-build-angular-back-azure-pipelines.yml
+          - template: template-publish-to-test-azure-pipelines.yml
+
+  - stage: IntegrationTests
+    displayName: "Integration tests"
+    dependsOn:
+      - Publish
+    jobs:
+      - job:
+        displayName: "Backend integration tests"
+        steps:
+          - template: template-integration-test-backend-azure-pipelines.yml
+
+  - stage: E2ETests
+    displayName: "E2E tests"
+    dependsOn:
+      - Publish
+    jobs:
+      - job:
+        displayName: "Vue frontend e2e tests"
+        steps:
+          - template: template-e2e-test-vue-front-azure-pipelines.yml
