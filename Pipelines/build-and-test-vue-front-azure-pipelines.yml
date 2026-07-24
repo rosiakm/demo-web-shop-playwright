@@ -1,0 +1,38 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - develop
+  paths:
+    include:
+      - "Frontend/personal-brand-front"
+
+pool:
+  name: Azure Pipelines
+  vmImage: "windows-2022"
+  demands:
+    - msbuild
+    - visualstudio
+    - vstest
+
+variables:
+  Parameters.FrontProject: "Frontend/personal-brand-front"
+
+stages:
+  - stage: Build
+    displayName: "Build"
+    jobs:
+      - job:
+        displayName: "Build Personal Brand Front - Vue application"
+        steps:
+          - template: template-build-vue-front-azure-pipelines.yml
+
+  - stage: UnitTests
+    displayName: "Unit tests"
+    dependsOn: Build
+    jobs:
+      - job:
+        displayName: "Vue frontend unit tests"
+        steps:
+          - template: template-unit-test-vue-front-azure-pipelines.yml
